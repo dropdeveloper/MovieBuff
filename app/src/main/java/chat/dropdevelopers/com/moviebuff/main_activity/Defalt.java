@@ -7,22 +7,26 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import java.util.ArrayList;
 
 import chat.dropdevelopers.com.moviebuff.R;
+import chat.dropdevelopers.com.moviebuff.Utils.StringData;
 import chat.dropdevelopers.com.moviebuff.adapters.CustomVideoAdapter;
 import chat.dropdevelopers.com.moviebuff.model.VideoModel;
 
 public class Defalt extends Fragment {
 
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
+    private static CustomVideoAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    private ArrayList<VideoModel> data;
+    private static ArrayList<VideoModel> data;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -40,6 +44,21 @@ public class Defalt extends Fragment {
 
         adapter = new CustomVideoAdapter(data, getContext());
         recyclerView.setAdapter(adapter);
+
+        //filter(StringData.SEARCH);
+
         return view;
+    }
+
+    public static void filter(String text) {
+        ArrayList<VideoModel> filteredList = new ArrayList<>();
+
+        for (VideoModel item : data) {
+            if (item.getName().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(item);
+            }
+        }
+
+        adapter.filterList(filteredList);
     }
 }

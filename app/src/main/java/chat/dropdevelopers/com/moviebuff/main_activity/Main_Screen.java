@@ -11,6 +11,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,11 +23,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import chat.dropdevelopers.com.moviebuff.R;
+import chat.dropdevelopers.com.moviebuff.Utils.StringData;
 import chat.dropdevelopers.com.moviebuff.adapters.Pager;
 import chat.dropdevelopers.com.moviebuff.downloadManeger.FileManager;
 
@@ -44,6 +49,8 @@ public class Main_Screen extends AppCompatActivity
             R.drawable.ic_recent
     };
 
+    public static EditText search;
+
     @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +63,7 @@ public class Main_Screen extends AppCompatActivity
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
 
+        search = findViewById(R.id.input);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
@@ -70,6 +78,39 @@ public class Main_Screen extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                switch (tabLayout.getSelectedTabPosition()){
+
+                    case 0:
+                        Defalt.filter(String.valueOf(charSequence));
+                        break;
+                    case 1:
+                        String s = search.getText().toString();
+                        Recent.filter(s);
+                        break;
+                    case 3:
+                        Trending.filter(String.valueOf(charSequence));
+                        break;
+                      default:
+                          break;
+                }
+                Log.e("POST----", String.valueOf(tabLayout.getSelectedTabPosition()));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     @Override

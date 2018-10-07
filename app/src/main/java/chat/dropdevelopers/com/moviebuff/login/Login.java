@@ -43,23 +43,6 @@ public class Login extends AppCompatActivity {
                     //Existing the method with return
                     Intent i = new Intent(getApplicationContext(), Main_Screen.class);
                     startActivity(i);
-                    String[] folders ={"Videos","Images","Catch"};
-                    for (int j = 0; j < folders.length; j++){
-                        File dir = new File(Environment.getExternalStorageDirectory(), "/movieBuff/"+folders[j]);
-                        try{
-                            if (dir.exists()){
-                                System.out.println("Directory created also");
-                            }else {
-                                if (dir.mkdir()) {
-                                    System.out.println("Directory created");
-                                } else {
-                                    System.out.println("Directory is not created");
-                                }
-                            }
-                        }catch(Exception e){
-                            e.printStackTrace();
-                        }
-                    }
 
                     return;
                 }

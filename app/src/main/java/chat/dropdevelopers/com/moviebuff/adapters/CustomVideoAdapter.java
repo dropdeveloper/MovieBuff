@@ -122,4 +122,9 @@ public class CustomVideoAdapter extends RecyclerView.Adapter<CustomVideoAdapter.
             mianView = itemView.findViewById(R.id.view_main);
         }
     }
+
+    public void filterList(ArrayList<VideoModel> filteredList) {
+        dataSet = filteredList;
+        notifyDataSetChanged();
+    }
 }

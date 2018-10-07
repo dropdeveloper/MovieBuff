@@ -8,4 +8,7 @@ public class StringData {
     public static String DISLIKE = "dislike";
     public static String SEEN = "seen";
     public static String IMG_URL = "image";
+    public static String FILE_URL = "file_path";
+    public static String FILE_NAME = "file_name";
+    public static String SEARCH = "search";
 }

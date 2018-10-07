@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -29,7 +29,8 @@
             android:label="@string/title_activity_main__screen"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".main_activity.VideoDetailView" />
-        <activity android:name=".downloadManeger.FileManager"></activity>
+        <activity android:name=".downloadManeger.FileManager" />
+        <activity android:name=".MusicPlayer.MusicPlayer" android:theme="@style/AppTheme_NO_ACTION"></activity>
     </application>
 
 </manifest>

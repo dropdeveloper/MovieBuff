@@ -57,6 +57,7 @@ private LinearLayout mainLayout;
     private static String youtubeLink;
     private LinearLayout ProgressView, DownloadView;
     private ProgressBar loading, proDown;
+    private File dir;
 @Override
 protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
@@ -242,20 +243,7 @@ public void onInitializationSuccess(YouTubePlayer.Provider provider,
 
     private boolean downloadFromUrl(String youtubeDlUrl, String downloadTitle, String fileName) {
 
-        File dir = new File(Environment.getExternalStorageDirectory(), "/movieBuff/Videos");
-        try{
-            if (dir.exists()){
-                System.out.println("Directory created also");
-            }else {
-                if (dir.mkdir()) {
-                    System.out.println("Directory created");
-                } else {
-                    System.out.println("Directory is not created");
-                }
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-        }
+        makeDir(VideoDetailView.this);
 
         Uri uri = Uri.parse(youtubeDlUrl);
         DownloadManager.Request request = new DownloadManager.Request(uri);
@@ -263,8 +251,9 @@ public void onInitializationSuccess(YouTubePlayer.Provider provider,
 
         request.allowScanningByMediaScanner();
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        File f =Environment.getExternalStorageDirectory().getAbsoluteFile();
-        request.setDestinationInExternalPublicDir(Environment.getExternalStorageDirectory()+"/movieBuff/Videos", fileName);
+        dir = new File(android.os.Environment.getExternalStorageDirectory(), "/MovieBuff/Videos");
+        request.setDestinationInExternalPublicDir(String.valueOf(dir), fileName);
+       // request.setDestinationInExternalFilesDir(VideoDetailView.this, String.valueOf(dir),fileName);
 
         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);
@@ -342,6 +331,19 @@ public void onInitializationSuccess(YouTubePlayer.Provider provider,
         }
     }
 
+    public void makeDir(Context context) {
+        // Find the dir to save cached images
+        if (android.os.Environment.getExternalStorageState().equals(
+                android.os.Environment.MEDIA_MOUNTED))
+            dir = new File(
+                    android.os.Environment.getExternalStorageDirectory(),
+                    "MovieBuff/Videos");
+        else
+            dir = context.getCacheDir();
+        if (!dir.exists())
+            dir.mkdirs();
+
+    }
 
 
 }

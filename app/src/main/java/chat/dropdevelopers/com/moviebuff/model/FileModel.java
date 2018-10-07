@@ -5,12 +5,14 @@ public class FileModel {
     String size;
     String date;
     String type;
+    String filePath;
 
-    public FileModel(String name, String size, String date, String type) {
+    public FileModel(String name, String size, String date, String type, String filePath) {
         this.name = name;
         this.size = size;
         this.date = date;
         this.type = type;
+        this.filePath = filePath;
     }
 
     public String getName() {
@@ -43,5 +45,13 @@ public class FileModel {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }
