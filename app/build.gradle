@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "chat.dropdevelopers.com.moviebuff"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -30,5 +30,5 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     implementation files('libs/YouTubeAndroidPlayerApi.jar')
     implementation 'com.github.HaarigerHarald:android-youtubeExtractor:master-SNAPSHOT'
-
+    implementation 'com.writingminds:FFmpegAndroid:0.3.2'
 }

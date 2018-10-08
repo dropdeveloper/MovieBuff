@@ -2,128 +2,79 @@ package chat.dropdevelopers.com.moviebuff.downloadManeger;
 
 import java.io.DataInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
-public class DownLoadManager {
+public class DownLoadManager extends AsyncTask<String, Integer, String> {
 
-    //MAKE SURE YOU HAVE SET INTERNET PERMISSION ....
+    private Context context;
+  //  private DownLoadManager.WakeLock mWakeLock;
 
-    public void startDownLoad(Context context, String sourceUrl,String destinationPath)
-    {
-        new DownLoadFileThread(context, sourceUrl, destinationPath).start();
+    public DownLoadManager(Context context) {
+        this.context = context;
     }
 
-    private static class DownLoadFileThread extends Thread{
+    @Override
+    protected String doInBackground(String... sUrl) {
+        InputStream input = null;
+        OutputStream output = null;
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(sUrl[0]);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.connect();
 
-        Context context=null;
-        String sourceUrl=null;
-        String destinationPath=null;
-
-        /*
-         * Make sure sourceUrl ends with a file to download and not a folder!.
-         *  Same with destinationPath.
-         *  Ex:
-         *
-         *  sourceUrl="http://www.tempurl.com/image1.jpg"
-         *  destinationPath="data/data/<package-name>/files/image1.jpg"
-         */
-        public DownLoadFileThread(Context context, String sourceUrl,String destinationPath)
-        {
-            this.context=context;
-            this.sourceUrl=sourceUrl;
-            this.destinationPath=destinationPath;
-        }
-
-        @Override
-        public void run()
-        {
-            downLoadFileFromServer();
-        }
-
-
-        public boolean downLoadFileFromServer()
-        {
-            Log.v("DEBUG", "sourceUrl: "+sourceUrl);
-            Log.v("DEBUG", "destinationPath: "+destinationPath);
-
-            InputStream urlInputStream=null;
-
-            URLConnection urlConnection ;
-
-            try
-            {
-                //Form a new URL
-                URL finalUrl =new URL(sourceUrl);
-
-                urlConnection = finalUrl.openConnection();
-
-                //Get the size of the (file) inputstream from server..
-                int contentLength=urlConnection.getContentLength();
-
-                Log.d("1URL","Streaming from "+sourceUrl+ "....");
-                DataInputStream stream = new DataInputStream(finalUrl.openStream());
-
-                Log.d("2FILE","Buffering the received stream(size="+contentLength+") ...");
-                byte[] buffer = new byte[contentLength];
-                stream.readFully(buffer);
-                stream.close();
-                Log.d("3FILE","Buffered successfully(Buffer.length="+buffer.length+")....");
-
-                if (buffer.length>0)
-                {
-                    try
-                    {
-                        Log.d("4FILE","Creating the new file..");
-                        FileOutputStream fos = context.openFileOutput(destinationPath, Context.MODE_PRIVATE);
-                        Log.d("5FILE","Writing from buffer to the new file..");
-                        fos.write(buffer);
-                        fos.flush();
-                        fos.close();
-                        Log.d("6.1FILE","Created the new file & returning 'true'..");
-                        return true;
-                    }
-                    catch (Exception e)
-                    {
-                        // TODO Auto-generated catch block
-                        Log.e("7ERROR", "Could not create new file(Path="+destinationPath+") ! & returning 'false'.......");
-                        e.printStackTrace();
-                        return false;
-                        /*Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show();*/
-                    }
-                }
-                else
-                {
-                    //Could not download the file...
-                    Log.e("8ERROR", "Buffer size is zero ! & returning 'false'.......");
-                    return false;
-                }
+            // expect HTTP 200 OK, so we don't mistakenly save error report
+            // instead of the file
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                return "Server returned HTTP " + connection.getResponseCode()
+                               + " " + connection.getResponseMessage();
             }
-            catch (Exception e)
-            {
-                Log.e("9ERROR", "Failed to open urlConnection/Stream the connection(From catch block) & returning 'false'..");
-                System.out.println("Exception: " + e);
-                e.printStackTrace();
-                return false;
-            }
-            finally
-            {
-                try
-                {
-                    Log.d("10URL", "Closing urlInputStream... ");
-                    if (urlInputStream != null) urlInputStream.close();
 
+            // this will be useful to display download percentage
+            // might be -1: server did not report the length
+            int fileLength = connection.getContentLength();
+
+            // download the file
+            input = connection.getInputStream();
+            output = new FileOutputStream("/sdcard/file_name.extension");
+
+            byte data[] = new byte[4096];
+            long total = 0;
+            int count;
+            while ((count = input.read(data)) != -1) {
+                // allow canceling with back button
+                if (isCancelled()) {
+                    input.close();
+                    return null;
                 }
-                catch (Exception e)
-                {
-                    Log.e("11ERROR", "Failed to close urlInputStream(From finally block)..");
-                }
+                total += count;
+                // publishing the progress....
+                if (fileLength > 0) // only if total length is known
+                    publishProgress((int) (total * 100 / fileLength));
+                output.write(data, 0, count);
             }
+        } catch (Exception e) {
+            return e.toString();
+        } finally {
+            try {
+                if (output != null)
+                    output.close();
+                if (input != null)
+                    input.close();
+            } catch (IOException ignored) {
+            }
+
+            if (connection != null)
+                connection.disconnect();
         }
+        return null;
     }
-
 }
-

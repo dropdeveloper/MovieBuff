@@ -61,7 +61,7 @@ public class FileManager extends AppCompatActivity {
 
     private void getFiles(){
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        String path = Environment.getExternalStorageDirectory().toString()+"/storage/emulated/0/MovieBuff/Videos";
+        String path = Environment.getExternalStorageDirectory().toString()+"/MovieBuff/Videos";
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
         File[] files = directory.listFiles();

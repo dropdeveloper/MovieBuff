@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.Bundle;
@@ -24,6 +25,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
@@ -39,6 +46,10 @@ import at.huber.youtubeExtractor.YouTubeExtractor;
 import at.huber.youtubeExtractor.YtFile;
 import chat.dropdevelopers.com.moviebuff.R;
 import chat.dropdevelopers.com.moviebuff.Utils.StringData;
+import chat.dropdevelopers.com.moviebuff.downloadManeger.DownloadFFmpegReciver;
+import chat.dropdevelopers.com.moviebuff.downloadManeger.DownloadReceiver;
+import chat.dropdevelopers.com.moviebuff.downloadManeger.DownloadService;
+import chat.dropdevelopers.com.moviebuff.downloadManeger.DownloadVaiFFmpeg;
 
 public class VideoDetailView extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener {
 
@@ -234,6 +245,22 @@ public void onInitializationSuccess(YouTubePlayer.Provider provider,
                 filename = filename.replaceAll("[\\\\><\"|*?%:#/]", "");
                 downloadFromUrl(ytfile.getUrl(), videoTitle, filename);
                 //finish();
+                Intent intent = new Intent(VideoDetailView.this, DownloadService.class);
+                intent.putExtra("url", ytfile.getUrl());
+                intent.putExtra("name", filename);
+                intent.putExtra("receiver", new DownloadReceiver(new Handler(), VideoDetailView.this,filename));
+                startService(intent);
+
+
+                //test
+
+//                Intent intent = new Intent(VideoDetailView.this, DownloadVaiFFmpeg.class);
+//                intent.putExtra("url", ytfile.getUrl());
+//                intent.putExtra("name", filename);
+//                intent.putExtra("receiver", new DownloadFFmpegReciver(new Handler()));
+//                startService(intent);
+
+                load(ytfile.getUrl());
             }
         });
         mainLayout.addView(btn);
@@ -337,7 +364,7 @@ public void onInitializationSuccess(YouTubePlayer.Provider provider,
                 android.os.Environment.MEDIA_MOUNTED))
             dir = new File(
                     android.os.Environment.getExternalStorageDirectory(),
-                    "MovieBuff/Videos");
+                    "MovieBuff/.temp");
         else
             dir = context.getCacheDir();
         if (!dir.exists())
@@ -345,5 +372,85 @@ public void onInitializationSuccess(YouTubePlayer.Provider provider,
 
     }
 
+
+    private void load(final String url){
+        FFmpeg ffmpeg = FFmpeg.getInstance(getBaseContext());
+        try {
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {
+                    Toast.makeText(getApplicationContext(),"Start",Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(getBaseContext(),"Fail",Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onSuccess() {
+                    addCammand(url);
+                }
+
+                @Override
+                public void onFinish() {}
+            });
+        } catch (FFmpegNotSupportedException e) {
+            // Handle if FFmpeg is not supported by device
+        }
+    }
+
+    private void addCammand(String url){
+        FFmpeg ffmpeg = FFmpeg.getInstance(getBaseContext());
+        String file_path = Environment.getExternalStorageDirectory()+"/MovieBuff/.temp/";
+        String logoPath = Environment.getExternalStorageDirectory().toString()+"/moviebuff.png";
+        try {
+            // to execute "ffmpeg -version" command you just need to pass "-version"
+
+            //Orginal command
+            //String[] cmd = {"-i",""+file_path+"/video.mp4","-i",""+file_path+"/logo1.png","-filter_complex","overlay=10:main_h-overlay_h-10",file_path+"/out.mp4"};
+
+            String[] cmd = {"-i",""+url,"-i",""+logoPath,"-filter_complex","overlay=10:main_h-overlay_h-10",getOutFilePath()};
+
+            ffmpeg.execute(cmd, new ExecuteBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {}
+
+                @Override
+                public void onProgress(String message) {
+                    Toast.makeText(getApplicationContext(),"Progress",Toast.LENGTH_SHORT).show();
+                    Log.e("PROGRESS", "WORKING.......");
+                }
+
+                @Override
+                public void onFailure(String message) {
+                    Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
+                    Log.e("FAIL VID",message);
+                }
+
+                @Override
+                public void onSuccess(String message) {
+                    Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
+                    Log.e("SUCSS VID",message);
+                }
+
+                @Override
+                public void onFinish() {}
+            });
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            // Handle if FFmpeg is already running
+            Log.e("FAIL VID",e.getMessage());
+        }
+    }
+
+
+    private String getOutFilePath(){
+
+        String file = Environment.getExternalStorageDirectory().toString()+"/MovieBuff/Videos/";
+        return file;
+    }
 
 }
