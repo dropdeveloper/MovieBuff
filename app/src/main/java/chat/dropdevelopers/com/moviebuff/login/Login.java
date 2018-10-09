@@ -16,8 +16,6 @@ import android.widget.Toast;
 import chat.dropdevelopers.com.moviebuff.R;
 import chat.dropdevelopers.com.moviebuff.main_activity.Main_Screen;
 
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
 
 import java.io.File;
 

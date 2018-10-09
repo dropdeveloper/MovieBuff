@@ -32,6 +32,7 @@ import chat.dropdevelopers.com.moviebuff.R;
 import chat.dropdevelopers.com.moviebuff.Utils.StringData;
 import chat.dropdevelopers.com.moviebuff.adapters.Pager;
 import chat.dropdevelopers.com.moviebuff.downloadManeger.FileManager;
+import chat.dropdevelopers.com.moviebuff.statusMaker.StatusMaker;
 
 public class Main_Screen extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, TabLayout.OnTabSelectedListener{
@@ -159,7 +160,9 @@ public class Main_Screen extends AppCompatActivity
             Intent i = new Intent(getApplicationContext(), FileManager.class);
             startActivity(i);
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_maker) {
+            Intent i = new Intent(getApplicationContext(), StatusMaker.class);
+            startActivity(i);
 
         } else if (id == R.id.nav_share) {
 

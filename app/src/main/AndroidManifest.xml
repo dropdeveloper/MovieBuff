@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -30,11 +31,17 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".main_activity.VideoDetailView" />
         <activity android:name=".downloadManeger.FileManager" />
-        <activity android:name=".MusicPlayer.MusicPlayer" android:theme="@style/AppTheme_NO_ACTION"></activity>
-        <service android:name=".downloadManeger.DownloadService"
+        <activity
+            android:name=".MusicPlayer.MusicPlayer"
+            android:theme="@style/AppTheme_NO_ACTION" />
+
+        <service
+            android:name=".downloadManeger.DownloadService"
             android:enabled="true"
             android:exported="true"
-            android:process=":process1"></service>
+            android:process=":process1" />
+
+        <activity android:name=".statusMaker.StatusMaker"></activity>
     </application>
 
 </manifest>
