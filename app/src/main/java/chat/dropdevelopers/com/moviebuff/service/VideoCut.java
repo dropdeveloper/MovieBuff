@@ -12,6 +12,7 @@ public class VideoCut extends IntentService {
      *
      * @param name Used to name the worker thread, important only for debugging.
      */
+    String file_path;
     public VideoCut(String name) {
         super("VideoCut");
     }
@@ -28,7 +29,11 @@ public class VideoCut extends IntentService {
         final String[] cmd = {"-i", "" + file_path,"-i",""+logoPath,"-filter_complex","overlay=10:main_h-overlay_h-10","-ss", start, "-t", end, getOutPut() + "/MOVBuff" + ts + ".mp4"};
         Log.e("TOTAL PART", String.valueOf(videoCounr));
         //StatusCutter(cmd, videoCounr);
-        LoadVideo(cmd);
 
+    }
+
+    private String getOutPut(){
+        String path = Environment.getExternalStorageDirectory().getPath()+"/MovieBuff/Status";
+        return path;
     }
 }

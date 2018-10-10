@@ -122,6 +122,7 @@ public class StatusMaker extends AppCompatActivity {
                 if (i < times.size()) {
                     intent.putExtra("start", times.get(i));
                     intent.putExtra("end", times.get(i + 1));
+                    intent.putExtra("file", file_path);
                     //  intent.putExtra("receiver", new DownloadReceiver(new Handler(), VideoDetailView.this,filename));
                 }else {
                     intent.putExtra("start", times.get(i-1));
@@ -253,7 +254,6 @@ public class StatusMaker extends AppCompatActivity {
 
 
     private long calculateProgress() {
-
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
         long i = 0;
