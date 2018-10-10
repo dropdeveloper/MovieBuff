@@ -1,5 +1,8 @@
 package chat.dropdevelopers.com.moviebuff.statusMaker;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -8,6 +11,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,16 +33,28 @@ import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunnin
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 
 import java.io.File;
+import java.io.IOException;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import chat.dropdevelopers.com.moviebuff.MusicPlayer.MusicPlayer;
 import chat.dropdevelopers.com.moviebuff.R;
+import chat.dropdevelopers.com.moviebuff.service.VideoCut;
 
 public class StatusMaker extends AppCompatActivity {
 
     private TextView StartTime, EndTime;
     private SeekBar seekBar;
-    private ImageButton PlayButton;
+    private ImageButton StatusMake;
     private Button CuttFirst, CuttSecond, Proceed;
     private VideoView Video;
     String file_path = "";
@@ -46,15 +62,23 @@ public class StatusMaker extends AppCompatActivity {
     MediaController mediaController;
     private Handler mHandler;
     private MediaPlayer player;
+    ProgressDialog progressDialog;
+
+    private String CuttStartTime = "";
+    private String EndStartTime = "";
+    NotificationManager mNotifyManager;
+    NotificationCompat.Builder mBuilder;
+    HashMap<String, String> map;
+    ArrayList<Integer> times;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_status_maker);
-
+        progressDialog = new ProgressDialog(StatusMaker.this);
         StartTime = findViewById(R.id.tv_start);
         EndTime = findViewById(R.id.tv_end);
         seekBar = findViewById(R.id.seek);
-        PlayButton = findViewById(R.id.bt_play);
+        StatusMake = findViewById(R.id.bt_play);
         CuttFirst = findViewById(R.id.bt_cutt_first);
         CuttSecond = findViewById(R.id.bt_cutt_second);
         Proceed = findViewById(R.id.bt_cutt);
@@ -62,7 +86,8 @@ public class StatusMaker extends AppCompatActivity {
         mHandler = new Handler();
         makeDir(this);
         mediaController= new MediaController(this);
-
+        times = new ArrayList<Integer>();
+        map = new HashMap<>();
         Long tsLong = System.currentTimeMillis()/1000;
         String ts = tsLong.toString();
 
@@ -70,34 +95,71 @@ public class StatusMaker extends AppCompatActivity {
 
         //Creating MediaController
 
+        final String logoPath = Environment.getExternalStorageDirectory().toString()+"/moviebuff.png";
 
         Proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoadVideo(cmd);
+                Long tsLong = System.currentTimeMillis()/1000;
+                String ts = tsLong.toString();
+
+                if (EndStartTime.equals("") && CuttStartTime.equals("")){
+
+                }else {
+                    final String[] cmd = {"-i", "" + file_path,"-i",""+logoPath,"-filter_complex","overlay=10:main_h-overlay_h-10","-ss", CuttStartTime, "-t", EndStartTime, getOutPut() + "/MOVBuff" + ts + ".mp4"};
+                    LoadVideo(cmd);
+                }
             }
         });
 
 
-//        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                if(player != null && fromUser){
-//                    Video.seekTo(progress * 100);
-//                }
-//            }
-//        });
+        StatusMake.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                for (int i = 0; i < times.size(); i++) {
+                Intent intent = new Intent(StatusMaker.this, VideoCut.class);
+                if (i < times.size()) {
+                    intent.putExtra("start", times.get(i));
+                    intent.putExtra("end", times.get(i + 1));
+                    //  intent.putExtra("receiver", new DownloadReceiver(new Handler(), VideoDetailView.this,filename));
+                }else {
+                    intent.putExtra("start", times.get(i-1));
+                    intent.putExtra("end", times.get(i));
+                }
+                startService(intent);
+                }
+            }
+        });
+
+
+    }
+
+
+    private void getCommand(String start, String end, int videoCounr){
+        Long tsLong = System.currentTimeMillis()/1000;
+        String ts = tsLong.toString();
+        final String logoPath = Environment.getExternalStorageDirectory().toString()+"/moviebuff.png";
+        final String[] cmd = {"-i", "" + file_path,"-i",""+logoPath,"-filter_complex","overlay=10:main_h-overlay_h-10","-ss", start, "-t", end, getOutPut() + "/MOVBuff" + ts + ".mp4"};
+        Log.e("TOTAL PART", String.valueOf(videoCounr));
+        //StatusCutter(cmd, videoCounr);
+        LoadVideo(cmd);
+
+    }
+
+    private String secToTime(int sec) {
+        int seconds = sec % 60;
+        int minutes = sec / 60;
+        if (minutes >= 60) {
+            int hours = minutes / 60;
+            minutes %= 60;
+            if( hours >= 24) {
+                int days = hours / 24;
+                return String.format("%d days %02d:%02d:%02d", days,hours%24, minutes, seconds);
+            }
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        }
+        return String.format("00:%02d:%02d", minutes, seconds);
     }
 
 
@@ -131,7 +193,7 @@ public class StatusMaker extends AppCompatActivity {
         }
     }
 
-    private void addCammand(String[] cmd){
+    private void addCammand(final String[] cmd){
         FFmpeg ffmpeg = FFmpeg.getInstance(this);
         String file_path = Environment.getExternalStorageDirectory().getPath();
         try {
@@ -145,19 +207,38 @@ public class StatusMaker extends AppCompatActivity {
                 @Override
                 public void onProgress(String message) {
                     Toast.makeText(getApplicationContext(),"Progress",Toast.LENGTH_SHORT).show();
+                    mNotifyManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    mBuilder = new NotificationCompat.Builder(StatusMaker.this);
+                    mBuilder.setContentTitle("Downloading File")
+                            .setContentText("Creating...")
+                            .setProgress(100, 0, false)
+                            .setOngoing(true)
+                            .setSmallIcon(R.mipmap.ic_launcher)
+                            .setPriority(Notification.PRIORITY_LOW);
 
+                    // Initialize Objects here
+                    //publishProgress("5");
+                    mNotifyManager.notify(55, mBuilder.build());
+                    //Log.e("VVVVVVVVV",String.valueOf(calculateProgress()));
+
+                    progressDialog.setTitle("Creating...");
+                    progressDialog.setMessage("Please wait...");
+                    progressDialog.show();
                 }
 
                 @Override
                 public void onFailure(String message) {
                     Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
                     Log.e("FAIL VID",message);
+                    progressDialog.dismiss();
                 }
 
                 @Override
                 public void onSuccess(String message) {
                     Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
                     Log.e("SUCSS VID",message);
+                    progressDialog.dismiss();
                 }
 
                 @Override
@@ -170,6 +251,24 @@ public class StatusMaker extends AppCompatActivity {
     }
 
 
+
+    private long calculateProgress() {
+
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
+        long i = 0;
+        try {
+            Date f = dateFormat.parse(CuttStartTime);
+            Date z = dateFormat.parse(EndStartTime);
+            i = z.getTime() - f.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return i;
+
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -190,6 +289,7 @@ public class StatusMaker extends AppCompatActivity {
             if (Video.isPlaying()){
                 Video.stopPlayback();
             }
+            times.clear();
             Intent intent = new Intent();
             intent.setType("video/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -227,19 +327,64 @@ public class StatusMaker extends AppCompatActivity {
                              StartTime.setText(getTimes(c_pos));
                              EndTime.setText(getTimes(mediaPlayer.getDuration()));
 
+                            long time =  TimeUnit.MILLISECONDS.toSeconds(mediaPlayer.getDuration());
+                            String totalDuration = getTimes(mediaPlayer.getDuration());
+                            System.out.println(totalDuration);
+
+
+                            long val = 000000;
+                            times.add((int)val);
+
+                            for (int i = 0; i < time; i++){
+                                System.out.print(i);
+
+                                if (val < time){
+
+                                    val = val+TimeUnit.SECONDS.toSeconds(30);
+                                    Log.e("Estimate", String.valueOf(val));
+                                    times.add((int)val);
+                                }
+
+                            }
+
                              StatusMaker.this.runOnUiThread(new Runnable() {
 
                                  @Override
                                  public void run() {
                                      if(mediaPlayer != null){
-                                         int mCurrentPosition = mediaPlayer.getCurrentPosition();
-                                         seekBar.setProgress(mCurrentPosition/1000);
-                                         StartTime.setText(getTimes(mediaPlayer.getCurrentPosition()));
+                                         try {
+                                             int mCurrentPosition = mediaPlayer.getCurrentPosition();
+                                             seekBar.setProgress(mCurrentPosition/1000);
+                                             StartTime.setText(getTimes(mediaPlayer.getCurrentPosition()));
+                                             long time =  TimeUnit.MILLISECONDS.toSeconds(mediaPlayer.getDuration());
+                                             String totalDuration = getTimes(mediaPlayer.getDuration());
+                                             System.out.println(totalDuration);
+
+
+//                                             long val = 000000;
+//
+//                                             for (int i = 0; i < time; i++){
+//                                                 System.out.print(i);
+//
+//                                                 if (val < time){
+//
+//                                                     val = val+TimeUnit.SECONDS.toSeconds(30);
+//                                                     Log.e("Estimate", String.valueOf(val));
+//                                                     times.add(String.valueOf(val));
+//                                                 }
+//
+//                                             }
+                                         }catch (IllegalStateException e){
+                                            // Log.e("ERROR",e.getMessage());
+                                         }
+
+
 
                                          CuttFirst.setOnClickListener(new View.OnClickListener() {
                                              @Override
                                              public void onClick(View view) {
                                                  Log.e("CUTT 1",String.valueOf(getTimes(mediaPlayer.getCurrentPosition())));
+                                                 CuttStartTime = getTimes(mediaPlayer.getCurrentPosition());
                                              }
                                          });
 
@@ -248,6 +393,7 @@ public class StatusMaker extends AppCompatActivity {
                                              @Override
                                              public void onClick(View view) {
                                                  Log.e("CUTT 2",String.valueOf(getTimes(mediaPlayer.getCurrentPosition())));
+                                                 EndStartTime = getTimes(mediaPlayer.getCurrentPosition());
 
                                              }
                                          });
@@ -318,19 +464,95 @@ public class StatusMaker extends AppCompatActivity {
         return path;
     }
 
-    private String millisecondsToString(int milliseconds)  {
-        long minutes = TimeUnit.MILLISECONDS.toMinutes((long) milliseconds);
-        long seconds =  TimeUnit.MILLISECONDS.toSeconds((long) milliseconds) ;
-        long hours = TimeUnit.HOURS.toHours((long) milliseconds);
-        return minutes+":"+ seconds;
-    }
 
     private String getTimes(int mCurrentPosition){
+        long hour = TimeUnit.MILLISECONDS.toHours((long) mCurrentPosition);
         long minut = TimeUnit.MILLISECONDS.toMinutes((long) mCurrentPosition);
-        long sec = TimeUnit.MILLISECONDS.toSeconds((long) mCurrentPosition);
+        long sec = TimeUnit.MILLISECONDS.toSeconds((long) mCurrentPosition) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(mCurrentPosition));
 
-       return minut+":"+sec;
+       return String.format("%02d:%02d:%02d", hour, minut, sec);
     }
+
+    private void CuttingFuction(){
+
+        for (int i = 0; i < map.size(); i++){
+
+        }
+    }
+
+    private void StatusCutter(final String[] cmd, final int Count){
+        FFmpeg ffmpeg = FFmpeg.getInstance(this);
+        try {
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {
+                    Toast.makeText(getApplicationContext(),"Start",Toast.LENGTH_SHORT).show();
+
+                }
+
+                @Override
+                public void onFailure() {
+                    Toast.makeText(getApplicationContext(),"Fail",Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onSuccess() {
+                    Cutting(cmd, Count);
+                }
+
+                @Override
+                public void onFinish() {}
+            });
+        } catch (FFmpegNotSupportedException e) {
+            // Handle if FFmpeg is not supported by device
+        }
+    }
+
+
+    private void Cutting(final String[] cmd, final int count){
+        FFmpeg ffmpeg = FFmpeg.getInstance(this);
+        String file_path = Environment.getExternalStorageDirectory().getPath();
+        try {
+            // to execute "ffmpeg -version" command you just need to pass "-version"
+
+            ffmpeg.execute(cmd, new ExecuteBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {}
+
+                @Override
+                public void onProgress(String message) {
+                    Toast.makeText(getApplicationContext(),"Progress",Toast.LENGTH_SHORT).show();
+                    progressDialog.setTitle("Creating..."+String.valueOf(count));
+                    progressDialog.setMessage("Please wait...");
+                    progressDialog.show();
+                }
+
+                @Override
+                public void onFailure(String message) {
+                    Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
+                    Log.e("FAIL VID",message);
+                    progressDialog.dismiss();
+                }
+
+                @Override
+                public void onSuccess(String message) {
+                    Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
+                    Log.e("SUCSS VID",message);
+                    progressDialog.dismiss();
+
+                }
+
+                @Override
+                public void onFinish() {}
+            });
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            // Handle if FFmpeg is already running
+            Log.e("FAIL VID",e.getMessage());
+        }
+    }
+
 
 
 }
