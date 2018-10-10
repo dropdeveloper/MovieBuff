@@ -245,22 +245,14 @@ public void onInitializationSuccess(YouTubePlayer.Provider provider,
                 filename = filename.replaceAll("[\\\\><\"|*?%:#/]", "");
                 downloadFromUrl(ytfile.getUrl(), videoTitle, filename);
                 //finish();
-                Intent intent = new Intent(VideoDetailView.this, DownloadService.class);
-                intent.putExtra("url", ytfile.getUrl());
-                intent.putExtra("name", filename);
-                intent.putExtra("receiver", new DownloadReceiver(new Handler(), VideoDetailView.this,filename));
-                startService(intent);
-
-
-                //test
-
-//                Intent intent = new Intent(VideoDetailView.this, DownloadVaiFFmpeg.class);
+//                Intent intent = new Intent(VideoDetailView.this, DownloadService.class);
 //                intent.putExtra("url", ytfile.getUrl());
 //                intent.putExtra("name", filename);
-//                intent.putExtra("receiver", new DownloadFFmpegReciver(new Handler()));
+//                intent.putExtra("receiver", new DownloadReceiver(new Handler(), VideoDetailView.this,filename));
 //                startService(intent);
 
                 load(ytfile.getUrl());
+
             }
         });
         mainLayout.addView(btn);

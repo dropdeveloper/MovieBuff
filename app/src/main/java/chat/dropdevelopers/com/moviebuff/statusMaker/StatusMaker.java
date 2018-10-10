@@ -224,8 +224,8 @@ public class StatusMaker extends AppCompatActivity {
                              seekBar.setMax(mediaPlayer.getDuration() /1000);
                              seekBar.setProgress(c_pos / 1000);
                              player = mediaPlayer;
-                             StartTime.setText(millisecondsToString(c_pos));
-                             EndTime.setText(millisecondsToString(mediaPlayer.getDuration()));
+                             StartTime.setText(getTimes(c_pos));
+                             EndTime.setText(getTimes(mediaPlayer.getDuration()));
 
                              StatusMaker.this.runOnUiThread(new Runnable() {
 
@@ -234,7 +234,23 @@ public class StatusMaker extends AppCompatActivity {
                                      if(mediaPlayer != null){
                                          int mCurrentPosition = mediaPlayer.getCurrentPosition();
                                          seekBar.setProgress(mCurrentPosition/1000);
-                                         StartTime.setText(millisecondsToString(mediaPlayer.getCurrentPosition()));
+                                         StartTime.setText(getTimes(mediaPlayer.getCurrentPosition()));
+
+                                         CuttFirst.setOnClickListener(new View.OnClickListener() {
+                                             @Override
+                                             public void onClick(View view) {
+                                                 Log.e("CUTT 1",String.valueOf(getTimes(mediaPlayer.getCurrentPosition())));
+                                             }
+                                         });
+
+
+                                         CuttSecond.setOnClickListener(new View.OnClickListener() {
+                                             @Override
+                                             public void onClick(View view) {
+                                                 Log.e("CUTT 2",String.valueOf(getTimes(mediaPlayer.getCurrentPosition())));
+
+                                             }
+                                         });
 
                                          seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
@@ -274,8 +290,7 @@ public class StatusMaker extends AppCompatActivity {
         if (cursor != null) {
             // HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
             // THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
-            int column_index = cursor
-                                       .getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
             cursor.moveToFirst();
             return cursor.getString(column_index);
         } else
@@ -308,6 +323,13 @@ public class StatusMaker extends AppCompatActivity {
         long seconds =  TimeUnit.MILLISECONDS.toSeconds((long) milliseconds) ;
         long hours = TimeUnit.HOURS.toHours((long) milliseconds);
         return minutes+":"+ seconds;
+    }
+
+    private String getTimes(int mCurrentPosition){
+        long minut = TimeUnit.MILLISECONDS.toMinutes((long) mCurrentPosition);
+        long sec = TimeUnit.MILLISECONDS.toSeconds((long) mCurrentPosition);
+
+       return minut+":"+sec;
     }
 
 

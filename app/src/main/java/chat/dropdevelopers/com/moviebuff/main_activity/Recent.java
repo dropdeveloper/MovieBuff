@@ -42,7 +42,7 @@ public class Recent extends Fragment {
         adapter = new CustomVideoAdapter(data, getContext());
         recyclerView.setAdapter(adapter);
 
-        //filter(StringData.SEARCH);
+        //filter(StringData.SEARCH);//
 
         return view;
     }
