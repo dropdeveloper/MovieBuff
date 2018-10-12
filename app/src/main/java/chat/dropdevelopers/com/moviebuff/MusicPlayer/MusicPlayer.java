@@ -98,7 +98,7 @@ public class MusicPlayer extends AppCompatActivity {
             }
         });
 
-
+//
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
             @Override
