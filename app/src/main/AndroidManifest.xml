@@ -41,12 +41,9 @@
             android:exported="true"
             android:process=":process1" />
 
-        <service
-            android:name=".service.VideoCut"
-            android:enabled="true"
-            android:exported="true"
-            android:process=":process" />
-        <activity android:name=".statusMaker.StatusMaker"></activity>
+
+        <activity android:name=".statusMaker.StatusMaker"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

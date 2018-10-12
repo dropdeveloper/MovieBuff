@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.MediaController;
@@ -31,6 +32,9 @@ import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +52,8 @@ import java.util.regex.Pattern;
 
 import chat.dropdevelopers.com.moviebuff.MusicPlayer.MusicPlayer;
 import chat.dropdevelopers.com.moviebuff.R;
+import chat.dropdevelopers.com.moviebuff.Utils.SharedHelper;
+import chat.dropdevelopers.com.moviebuff.Utils.StringData;
 import chat.dropdevelopers.com.moviebuff.service.VideoCut;
 
 public class StatusMaker extends AppCompatActivity {
@@ -70,10 +76,13 @@ public class StatusMaker extends AppCompatActivity {
     NotificationCompat.Builder mBuilder;
     HashMap<String, String> map;
     ArrayList<Integer> times;
+    SharedHelper sharedHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_status_maker);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         progressDialog = new ProgressDialog(StatusMaker.this);
         StartTime = findViewById(R.id.tv_start);
         EndTime = findViewById(R.id.tv_end);
@@ -88,6 +97,9 @@ public class StatusMaker extends AppCompatActivity {
         mediaController= new MediaController(this);
         times = new ArrayList<Integer>();
         map = new HashMap<>();
+        sharedHelper = new SharedHelper(this);
+
+
         Long tsLong = System.currentTimeMillis()/1000;
         String ts = tsLong.toString();
 
@@ -117,18 +129,26 @@ public class StatusMaker extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                for (int i = 0; i < times.size(); i++) {
-                Intent intent = new Intent(StatusMaker.this, VideoCut.class);
-                if (i < times.size()) {
-                    intent.putExtra("start", times.get(i));
-                    intent.putExtra("end", times.get(i + 1));
-                    intent.putExtra("file", file_path);
-                    //  intent.putExtra("receiver", new DownloadReceiver(new Handler(), VideoDetailView.this,filename));
+                if (times.size() > 0) {
+                    JSONObject jsonObject = new JSONObject();
+                    int size;
+                    for (int i = 0; i < times.size(); i++) {
+                        try {
+                            jsonObject.put(String.valueOf(i), String.valueOf(times.get(i)));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    Log.e("CUTTING STS", "Status");
+                    sharedHelper.setBoolean(StringData.EN_CUT, true);
+                    sharedHelper.putString(StringData.CUT_JSON, jsonObject.toString());
+                    sharedHelper.setInt(StringData.CUT_COUNT, times.size() - 1);
+                    sharedHelper.setInt(StringData.CUT_POS, 1);
+                    getCommand(secToTime(times.get(0)), secToTime(times.get(1)), 1);
+                    Log.e("CUTTING TIME :-", secToTime(times.get(0)) + " - " + secToTime(times.get(1)));
                 }else {
-                    intent.putExtra("start", times.get(i-1));
-                    intent.putExtra("end", times.get(i));
-                }
-                startService(intent);
+                    Toast.makeText(getApplicationContext(),"Video is small size",Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -141,11 +161,12 @@ public class StatusMaker extends AppCompatActivity {
         Long tsLong = System.currentTimeMillis()/1000;
         String ts = tsLong.toString();
         final String logoPath = Environment.getExternalStorageDirectory().toString()+"/moviebuff.png";
-        final String[] cmd = {"-i", "" + file_path,"-i",""+logoPath,"-filter_complex","overlay=10:main_h-overlay_h-10","-ss", start, "-t", end, getOutPut() + "/MOVBuff" + ts + ".mp4"};
+        final String[] cmd = {"-i", "" + file_path,"-i",""+logoPath,"-filter_complex","overlay=10:main_h-overlay_h-10","-ss", start, "-t", end ,getOutPut() + "/MOVBuff" + ts + "-("+String.valueOf(videoCounr)+").mp4"};
         Log.e("TOTAL PART", String.valueOf(videoCounr));
-        //StatusCutter(cmd, videoCounr);
-        LoadVideo(cmd);
-
+        StatusCutter(cmd, videoCounr);
+        Log.e("CUTTING TIME OG :-",start+" - "+end);
+        start = null;
+        end = null;
     }
 
     private String secToTime(int sec) {
@@ -252,24 +273,6 @@ public class StatusMaker extends AppCompatActivity {
     }
 
 
-
-    private long calculateProgress() {
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss");
-        long i = 0;
-        try {
-            Date f = dateFormat.parse(CuttStartTime);
-            Date z = dateFormat.parse(EndStartTime);
-            i = z.getTime() - f.getTime();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return i;
-
-
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -360,20 +363,6 @@ public class StatusMaker extends AppCompatActivity {
                                              String totalDuration = getTimes(mediaPlayer.getDuration());
                                              System.out.println(totalDuration);
 
-
-//                                             long val = 000000;
-//
-//                                             for (int i = 0; i < time; i++){
-//                                                 System.out.print(i);
-//
-//                                                 if (val < time){
-//
-//                                                     val = val+TimeUnit.SECONDS.toSeconds(30);
-//                                                     Log.e("Estimate", String.valueOf(val));
-//                                                     times.add(String.valueOf(val));
-//                                                 }
-//
-//                                             }
                                          }catch (IllegalStateException e){
                                             // Log.e("ERROR",e.getMessage());
                                          }
@@ -473,14 +462,10 @@ public class StatusMaker extends AppCompatActivity {
        return String.format("%02d:%02d:%02d", hour, minut, sec);
     }
 
-    private void CuttingFuction(){
 
-        for (int i = 0; i < map.size(); i++){
-
-        }
-    }
 
     private void StatusCutter(final String[] cmd, final int Count){
+        player.stop();
         FFmpeg ffmpeg = FFmpeg.getInstance(this);
         try {
             ffmpeg.loadBinary(new LoadBinaryResponseHandler() {
@@ -524,7 +509,9 @@ public class StatusMaker extends AppCompatActivity {
                 @Override
                 public void onProgress(String message) {
                     Toast.makeText(getApplicationContext(),"Progress",Toast.LENGTH_SHORT).show();
-                    progressDialog.setTitle("Creating..."+String.valueOf(count));
+                   // Log.e("CUTTING PROGRE", message);
+                    int total_part  = sharedHelper.getInt(StringData.CUT_COUNT);
+                    progressDialog.setTitle("Creating("+String.valueOf(count)+"/"+String.valueOf(total_part)+")");
                     progressDialog.setMessage("Please wait...");
                     progressDialog.show();
                 }
@@ -541,6 +528,55 @@ public class StatusMaker extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
                     Log.e("SUCSS VID",message);
                     progressDialog.dismiss();
+
+                    boolean status = sharedHelper.getBoolean(StringData.EN_CUT);
+                    if (status) {
+
+                        int cut_size = sharedHelper.getInt(StringData.CUT_COUNT);
+                        String Json = sharedHelper.getString(StringData.CUT_JSON);
+                        try {
+                            JSONObject jsonObject = new JSONObject(Json);
+                            for (int i = 0; i < cut_size; i++){
+                                times.add(jsonObject.getInt(String.valueOf(i + 1)));
+
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        int position = sharedHelper.getInt(StringData.CUT_POS);
+                        if (cut_size > position+1) {
+                            String s_time = secToTime(times.get(position));
+                            String e_time;
+                            if (position == 1){
+                                e_time = secToTime(times.get(position));
+                            }else {
+                                e_time = secToTime(times.get(position + 1));
+                            }
+                           // e_time = secToTime(times.get(position));
+                            Log.e("CUTTING -->", s_time +"-"+ e_time);
+                            Log.e("VALUE - ", String.valueOf(times.get(position))+" - "+String.valueOf(times.get(position + 1)));
+                            progressDialog.dismiss();
+                            getCommand(s_time, e_time, position + 1);
+                            sharedHelper.setInt(StringData.CUT_POS , position + 1);
+                        }else {
+
+                            String s_time = secToTime(times.get(position - 1));
+                            String e_time= secToTime(times.get(position - 1));
+                            // e_time = secToTime(times.get(position));
+                            Log.e("CUTTING -->", s_time +"-"+ e_time);
+                            Log.e("VALUE - ", String.valueOf(times.get(position))+" - "+String.valueOf(times.get(position + 1)));
+                            progressDialog.dismiss();
+                            getCommand(s_time, e_time, position + 1);
+                            sharedHelper.setInt(StringData.CUT_POS , position + 1);
+                            sharedHelper.setBoolean(StringData.EN_CUT, false);
+                            Log.e("CUTTING -->","FINISH");
+                        }
+                    }else {
+                        Log.e("CUTTING -->", "No data");
+                        progressDialog.dismiss();
+                    }
 
                 }
 

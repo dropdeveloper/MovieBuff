@@ -11,4 +11,8 @@ public class StringData {
     public static String FILE_URL = "file_path";
     public static String FILE_NAME = "file_name";
     public static String SEARCH = "search";
+    public static String CUT_JSON = "c_json";
+    public static String EN_CUT = "en_cut";
+    public static String CUT_COUNT = "count";
+    public static String CUT_POS = "pos";
 }

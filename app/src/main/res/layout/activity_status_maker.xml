@@ -130,6 +130,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="2dp"
             android:gravity="center">
 
             <Button
@@ -144,8 +146,8 @@
                 android:layout_height="44dp"
                 android:background="@drawable/cutter_button"
                 android:id="@+id/bt_play"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:src="@drawable/ic_filter_tilt_shift_black_24dp"/>
             <Button
                 android:layout_width="wrap_content"
@@ -155,14 +157,14 @@
                 android:text="]"/>
 
         </LinearLayout>
-
-
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/bt_cutt"
-            android:layout_marginTop="10dp"
-            android:text="Cutt"/>
     </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bt_cutt"
+        android:background="@color/app_vialot_color"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="10dp"
+        android:text="Cut"/>
 </LinearLayout>
