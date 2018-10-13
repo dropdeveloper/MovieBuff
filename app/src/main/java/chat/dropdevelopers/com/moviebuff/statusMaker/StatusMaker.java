@@ -165,8 +165,7 @@ public class StatusMaker extends AppCompatActivity {
         Log.e("TOTAL PART", String.valueOf(videoCounr));
         StatusCutter(cmd, videoCounr);
         Log.e("CUTTING TIME OG :-",start+" - "+end);
-        start = null;
-        end = null;
+
     }
 
     private String secToTime(int sec) {
@@ -242,7 +241,6 @@ public class StatusMaker extends AppCompatActivity {
                     // Initialize Objects here
                     //publishProgress("5");
                     mNotifyManager.notify(55, mBuilder.build());
-                    //Log.e("VVVVVVVVV",String.valueOf(calculateProgress()));
 
                     progressDialog.setTitle("Creating...");
                     progressDialog.setMessage("Please wait...");
@@ -496,7 +494,7 @@ public class StatusMaker extends AppCompatActivity {
 
 
     private void Cutting(final String[] cmd, final int count){
-        FFmpeg ffmpeg = FFmpeg.getInstance(this);
+        final FFmpeg ffmpeg = FFmpeg.getInstance(this);
         String file_path = Environment.getExternalStorageDirectory().getPath();
         try {
             // to execute "ffmpeg -version" command you just need to pass "-version"
@@ -529,8 +527,10 @@ public class StatusMaker extends AppCompatActivity {
                     Log.e("SUCSS VID",message);
                     progressDialog.dismiss();
 
+                    ffmpeg.killRunningProcesses();
+
                     boolean status = sharedHelper.getBoolean(StringData.EN_CUT);
-                    if (status) {
+                    if (status && ! ffmpeg.isFFmpegCommandRunning()) {
 
                         int cut_size = sharedHelper.getInt(StringData.CUT_COUNT);
                         String Json = sharedHelper.getString(StringData.CUT_JSON);
@@ -547,23 +547,30 @@ public class StatusMaker extends AppCompatActivity {
 
                         int position = sharedHelper.getInt(StringData.CUT_POS);
                         if (cut_size > position+1) {
-                            String s_time = secToTime(times.get(position));
+                            String s_time;
                             String e_time;
+
                             if (position == 1){
-                                e_time = secToTime(times.get(position));
-                            }else {
+                                s_time = secToTime(times.get(position));
                                 e_time = secToTime(times.get(position + 1));
+                            }else if (position == 2){
+                                s_time = secToTime(times.get(position));
+                                e_time = secToTime(times.get(position - 1));
+                            }else {
+                                s_time = secToTime(times.get(position));
+                                e_time = secToTime(times.get(position - 1));
                             }
+
                            // e_time = secToTime(times.get(position));
                             Log.e("CUTTING -->", s_time +"-"+ e_time);
                             Log.e("VALUE - ", String.valueOf(times.get(position))+" - "+String.valueOf(times.get(position + 1)));
                             progressDialog.dismiss();
                             getCommand(s_time, e_time, position + 1);
                             sharedHelper.setInt(StringData.CUT_POS , position + 1);
-                        }else {
+                         }else {
 
-                            String s_time = secToTime(times.get(position - 1));
-                            String e_time= secToTime(times.get(position - 1));
+                            String s_time = secToTime(times.get(position));
+                            String e_time= secToTime(times.get(position));
                             // e_time = secToTime(times.get(position));
                             Log.e("CUTTING -->", s_time +"-"+ e_time);
                             Log.e("VALUE - ", String.valueOf(times.get(position))+" - "+String.valueOf(times.get(position + 1)));

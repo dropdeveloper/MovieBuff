@@ -28,7 +28,8 @@
         <activity
             android:name=".main_activity.Main_Screen"
             android:label="@string/title_activity_main__screen"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBarMain" />
+
         <activity android:name=".main_activity.VideoDetailView" />
         <activity android:name=".downloadManeger.FileManager" />
         <activity
@@ -41,9 +42,21 @@
             android:exported="true"
             android:process=":process1" />
 
-
         <activity android:name=".statusMaker.StatusMaker"
             android:screenOrientation="portrait"></activity>
+
+        <service android:name=".firebase.FireIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service android:name=".firebase.FireMsgService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

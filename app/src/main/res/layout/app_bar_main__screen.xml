@@ -9,24 +9,32 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:background="@drawable/action_bar">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:navigationIcon="@drawable/ic_menu_button"
-            app:popupTheme="@style/AppTheme_NO_ACTION" />
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:elevation="0dp"
+                android:minHeight="?attr/actionBarSize"
+                app:contentInsetStartWithNavigation="0dp"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:subtitleTextColor="@android:color/white"
+                app:theme="@style/AppTheme.NoActionBarMain"
+                app:titleTextColor="@android:color/white" />
 
         <!-- our tablayout to display tabs  -->
         <android.support.design.widget.TabLayout
             android:id="@+id/tabLayout"
+            android:paddingBottom="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
             android:minHeight="?attr/actionBarSize"
-            android:theme="@style/AppTheme.NoActionBar" />
+            app:tabIndicatorColor="@android:color/white"
+            app:tabIndicatorHeight="4dp"
+            app:tabIndicator="@drawable/tab_indicator_icon"
+            app:tabIndicatorFullWidth="false"/>
 
     </android.support.design.widget.AppBarLayout>
 

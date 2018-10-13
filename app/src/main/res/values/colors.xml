@@ -5,4 +5,7 @@
     <color name="colorAccent">#D81B60</color>
 
     <color name="app_vialot_color">#4A148C</color>
+    <color name="rose">#270ab9</color>
+    <color name="center_rose">#3e20a9</color>
+    <color name="end_rose">#8252f1</color>
 </resources>

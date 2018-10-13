@@ -45,30 +45,26 @@ public class Main_Screen extends AppCompatActivity
 
 
     private int[] tabIcons = {
-            R.drawable.ic_tape,
-            R.drawable.ic_trending,
-            R.drawable.ic_recent
+            R.drawable.ic_recent_icon,
+            R.drawable.ic_hot,
+            R.drawable.ic_status
     };
 
-    public static EditText search;
 
-    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main__screen);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitleTextColor(R.color.app_vialot_color);
-        toolbar.setNavigationIcon(R.drawable.ic_menu_button);
+        setTitle("MovieBuff");
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
 
-        search = findViewById(R.id.input);
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
-
+        tabLayout.getTabAt(1).select();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -80,38 +76,6 @@ public class Main_Screen extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        search.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                switch (tabLayout.getSelectedTabPosition()){
-
-                    case 0:
-                        Defalt.filter(String.valueOf(charSequence));
-                        break;
-                    case 1:
-                        String s = search.getText().toString();
-                        Recent.filter(s);
-                        break;
-                    case 3:
-                        Trending.filter(String.valueOf(charSequence));
-                        break;
-                      default:
-                          break;
-                }
-                Log.e("POST----", String.valueOf(tabLayout.getSelectedTabPosition()));
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
     }
 
     @Override

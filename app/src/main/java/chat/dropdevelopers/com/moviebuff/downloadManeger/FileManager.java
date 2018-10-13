@@ -1,7 +1,9 @@
 package chat.dropdevelopers.com.moviebuff.downloadManeger;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -11,6 +13,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.PopupWindow;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -32,6 +38,8 @@ public class FileManager extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<FileModel> data;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,5 +122,23 @@ public class FileManager extends AppCompatActivity {
             default:
                 break;
         }
+    }
+
+    public static void displayPopupWindow(View anchorView, Context context) {
+        PopupWindow popup = new PopupWindow(context);
+       // View layout = getLayoutInflater().inflate(R.layout.popup_menu, null);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        View view = inflater.inflate( R.layout.popup_menu, null );
+
+        popup.setContentView(view);
+        // Set content width and height
+        popup.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        popup.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+        // Closes the popup window when touch outside of it - when looses focus
+        popup.setOutsideTouchable(true);
+        popup.setFocusable(true);
+        // Show anchored to button
+        popup.setBackgroundDrawable(new BitmapDrawable());
+        popup.showAsDropDown(anchorView);
     }
 }

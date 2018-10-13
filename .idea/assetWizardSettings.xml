@@ -28,8 +28,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_play_black_24dp" />
-                            <entry key="sourceFile" value="C:\Users\Hp" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="ic_hot" />
+                            <entry key="sourceFile" value="C:\Users\Hp\Downloads\fire-symbol.svg" />
                           </map>
                         </option>
                       </PersistentState>

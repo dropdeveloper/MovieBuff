@@ -2,6 +2,7 @@ package chat.dropdevelopers.com.moviebuff.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.VibrationEffect;
@@ -11,8 +12,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import java.util.ArrayList;
 import chat.dropdevelopers.com.moviebuff.MusicPlayer.MusicPlayer;
 import chat.dropdevelopers.com.moviebuff.R;
 import chat.dropdevelopers.com.moviebuff.Utils.StringData;
+import chat.dropdevelopers.com.moviebuff.downloadManeger.FileManager;
 import chat.dropdevelopers.com.moviebuff.model.FileModel;
 
 public class FilemangerAdapter extends RecyclerView.Adapter<FilemangerAdapter.MyViewHolder> {
@@ -37,7 +41,7 @@ public class FilemangerAdapter extends RecyclerView.Adapter<FilemangerAdapter.My
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FilemangerAdapter.MyViewHolder holder, final int i) {
+    public void onBindViewHolder(@NonNull final FilemangerAdapter.MyViewHolder holder, final int i) {
 
         holder.file_name.setText(dataSet.get(i).getName());
         holder.file_size.setText(dataSet.get(i).getSize());
@@ -91,6 +95,8 @@ public class FilemangerAdapter extends RecyclerView.Adapter<FilemangerAdapter.My
                     vibrator.vibrate(200);
                 }
 
+                FileManager.displayPopupWindow(view.getRootView(), context);
+
                 return false;
             }
         });
@@ -124,4 +130,6 @@ public class FilemangerAdapter extends RecyclerView.Adapter<FilemangerAdapter.My
             main_item = itemView.findViewById(R.id.main_item);
         }
     }
+
+
 }

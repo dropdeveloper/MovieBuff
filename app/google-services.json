@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "280818590543",
+    "firebase_url": "https://moviebuff-fe7e7.firebaseio.com",
+    "project_id": "moviebuff-fe7e7",
+    "storage_bucket": "moviebuff-fe7e7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:280818590543:android:54bfe14185c4900b",
+        "android_client_info": {
+          "package_name": "chat.dropdevelopers.com.moviebuff"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "280818590543-cglb0bce84d5kmdjr0o0qa7864a1b4cq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnE9SNguXs_XoRnEj3Jiis45vEhAm80uI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
