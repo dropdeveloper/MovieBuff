@@ -82,4 +82,14 @@
         <item name="background">@color/colorPrimary</item>
         <item name="backgroundSplit">@color/colorPrimary</item>
     </style>
+
+    //transfrent actionbar
+
+    <style name="AppTheme.Tranfrent" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#00ffffff</item>
+        <item name="colorPrimaryDark">#00ffffff</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
 </resources>

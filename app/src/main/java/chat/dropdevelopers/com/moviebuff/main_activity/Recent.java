@@ -16,46 +16,64 @@ import java.util.ArrayList;
 
 import chat.dropdevelopers.com.moviebuff.R;
 import chat.dropdevelopers.com.moviebuff.adapters.CustomVideoAdapter;
+import chat.dropdevelopers.com.moviebuff.adapters.StatusAdapter;
+import chat.dropdevelopers.com.moviebuff.adapters.StatusCategoryAdapter;
+import chat.dropdevelopers.com.moviebuff.model.StatusCateModel;
+import chat.dropdevelopers.com.moviebuff.model.StatusModel;
 import chat.dropdevelopers.com.moviebuff.model.VideoModel;
 
 public class Recent extends Fragment {
 
-    private RecyclerView recyclerView;
-    private static CustomVideoAdapter adapter;
+    private RecyclerView recyclerView, categoryRecycler;
+    private static StatusAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    private static ArrayList<VideoModel> data;
+    private StatusCategoryAdapter cateAdapter;
+    private static ArrayList<StatusModel> data;
+    private ArrayList<StatusCateModel> category;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(container.getContext()).inflate(R.layout.recent, container, false);
 
         recyclerView = view.findViewById(R.id.rec_view);
+        categoryRecycler = view.findViewById(R.id.rec_view_cate);
         layoutManager = new LinearLayoutManager(view.getContext());
+        categoryRecycler.setLayoutManager(new LinearLayoutManager(view.getContext(), LinearLayoutManager.HORIZONTAL, false));
+        categoryRecycler.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        data = new ArrayList<VideoModel>();
-        data.add(new VideoModel("Kayamkulam Kochunni ", "A romantic film directed by Roshan Andrews, starring Nivin Pauly and Priya Anand in the lead roles. ", "https://images.moviebuff.com/09d3101c-cb96-4101-8aa5-77523374daaf?w=500", "CDwvzTzSib8", 44,10,"", 5));
-        data.add(new VideoModel("Mandharam", "Rajesh faces various stages of life filled with warmth and contentment from his relationships with people around him.", "https://images.moviebuff.com/d5eb1408-fded-4060-ab54-82b316032920?w=500", "TkvQPNdGAKc", 10,0,"",22));
-        data.add(new VideoModel("Wonder Boys", "A thriller film directed by Sreekanth S Nair, starring Bala and Praveen in the lead roles.", "https://images.moviebuff.com/3fab936a-2d98-417a-8eb4-ee7edbbc3687?w=500", "CrPofg-yY4M", 20,10,"", 44));
-        data.add(new VideoModel("Varathan", "A couple shifts from Dubai to the latter's family estate in Kerala to figure things out while troubles confront the couple.", "https://images.moviebuff.com/803330a5-755d-43df-892d-02916a80fe17?w=500", "pbg78Dbl_m0", 22,5,"",55));
+        category = new ArrayList<StatusCateModel>();
 
-        adapter = new CustomVideoAdapter(data, getContext());
+        data = new ArrayList<StatusModel>();
+        data.add(new StatusModel("", "Abu", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",10, "",5, 5));
+        data.add(new StatusModel("", "Rim", "","http://dropdevelopers.vcandu.com/1537855313.mp4",20, "",5, 5));
+        data.add(new StatusModel("", "Vishnu", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",30, "",5, 5));
+        data.add(new StatusModel("", "Jio", "","http://dropdevelopers.vcandu.com/1537855313.mp4",10, "",5, 5));
+        data.add(new StatusModel("", "Muhammed", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",20, "",5, 5));
+        data.add(new StatusModel("", "Biju", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",30, "",5, 5));
+        data.add(new StatusModel("", "Riju", "","http://dropdevelopers.vcandu.com/1537855313.mp4",10, "",5, 5));
+        data.add(new StatusModel("", "Manu", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",10, "",5, 5));
+
+
+        adapter = new StatusAdapter(data, view.getContext());
         recyclerView.setAdapter(adapter);
 
-        //filter(StringData.SEARCH);//
+        category.add(new StatusCateModel("Funny","33"));
+        category.add(new StatusCateModel("Songs","66"));
+        category.add(new StatusCateModel("Cinema","99"));
+        category.add(new StatusCateModel("Love","9"));
+        category.add(new StatusCateModel("Famly","7"));
+        category.add(new StatusCateModel("Football","7"));
+        category.add(new StatusCateModel("Comedy","7"));
+        category.add(new StatusCateModel("Filim Stars","7"));
+        category.add(new StatusCateModel("Cricket","7"));
+
+        cateAdapter = new StatusCategoryAdapter(category);
+        categoryRecycler.setAdapter(cateAdapter);
+
 
         return view;
     }
 
-    public static void filter(String text) {
-        ArrayList<VideoModel> filteredList = new ArrayList<>();
 
-        for (VideoModel item : data) {
-            if (item.getName().toLowerCase().contains(text.toLowerCase())) {
-                filteredList.add(item);
-            }
-        }
-
-        adapter.filterList(filteredList);
-    }
 }
