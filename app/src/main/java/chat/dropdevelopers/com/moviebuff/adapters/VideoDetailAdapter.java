@@ -1,36 +1,71 @@
 package chat.dropdevelopers.com.moviebuff.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.example.mylibrary.Loading;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 
 import chat.dropdevelopers.com.moviebuff.R;
+import chat.dropdevelopers.com.moviebuff.Utils.CustomLayoutManager;
+import chat.dropdevelopers.com.moviebuff.main_activity.VideoListActivity;
 import chat.dropdevelopers.com.moviebuff.model.StatusModel;
+import cn.jzvd.Jzvd;
+import cn.jzvd.JzvdStd;
 
-public class VideoDetailAdapter extends RecyclerView.Adapter<VideoDetailAdapter.MyViewHolder>{
+import static cn.jzvd.Jzvd.SCREEN_WINDOW_NORMAL;
+
+    public class VideoDetailAdapter extends RecyclerView.Adapter<VideoDetailAdapter.MyViewHolder> {
 
     private ArrayList<StatusModel> dataSet;
     private Context context;
+    private LinearLayoutManager layoutManager;
+    private RecyclerView recyclerView;
 
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-       View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.demmi_full_video, viewGroup, false);
-       MyViewHolder myViewHolder = new MyViewHolder(view);
-       return myViewHolder;
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.demmi_full_video, viewGroup, false);
+        MyViewHolder myViewHolder = new MyViewHolder(view);
+        return myViewHolder;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -42,66 +77,28 @@ public class VideoDetailAdapter extends RecyclerView.Adapter<VideoDetailAdapter.
         myViewHolder.like.setText(String.valueOf(dataSet.get(i).getLike()));
         myViewHolder.name.setText(String.valueOf(dataSet.get(i).getName()));
 
-        String link="http://www.vcandu.com//videoUploads//Uploads//%E0%B4%AE%E0%B4%B4%E0%B4%AF%E0%B5%87%20%E0%B4%A4%E0%B5%82%E0%B4%AE%E0%B4%B4%E0%B4%AF%E0%B5%87%20Malayalam.mp4";
 
-        //loading.setLoading(false);
+        dataSet.get(i).setPlayer(ExoPlayerFactory.newSimpleInstance(
+                new DefaultRenderersFactory(context), new DefaultTrackSelector(), new DefaultLoadControl()));
+
+        myViewHolder.mExoPlayer.setPlayer(dataSet.get(i).getPlayer());
+
+         dataSet.get(i).getPlayer().setPlayWhenReady(dataSet.get(i).getPlayWhenReady());
+         dataSet.get(i).getPlayer().seekTo(dataSet.get(i).getCurrentWindow(), dataSet.get(i).getPlaybackPosition());
+
+        Uri uri = Uri.parse(dataSet.get(i).getVideo_url());
+        MediaSource mediaSource = buildMediaSource(uri);
+        dataSet.get(i).getPlayer().prepare(mediaSource, true, false);
+        dataSet.get(i).getPlayer().setPlayWhenReady(true);
+        myViewHolder.mExoPlayer.setUseController(false);
+
+
+        int x =layoutManager.findFirstVisibleItemPosition();
+//        dataSet.get(oldPos).getPlayer().stop();
 
 
 
-        myViewHolder.video.setVideoPath(link);
-        myViewHolder.video.start();
-        myViewHolder.video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            public void onPrepared(MediaPlayer mp) {
-                mp.setLooping(true);
-                myViewHolder.video.start();
-                myViewHolder.loading.setVisibility(View.GONE);
 
-            }
-
-        });
-
-        final MediaPlayer.OnInfoListener onInfoToPlayStateListener = new MediaPlayer.OnInfoListener() {
-
-            @Override
-            public boolean onInfo(MediaPlayer mp, int what, int extra) {
-                switch (what) {
-                    case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START: {
-                       // mProgressBar.setVisibility(View.GONE);
-                        myViewHolder.loading.setVisibility(View.GONE);
-                        return true;
-                    }
-                    case MediaPlayer.MEDIA_INFO_BUFFERING_START: {
-                        //mProgressBar.setVisibility(View.VISIBLE);
-                        myViewHolder.loading.setVisibility(View.VISIBLE);
-                        return true;
-                    }
-                    case MediaPlayer.MEDIA_INFO_BUFFERING_END: {
-                        //mProgressBar.setVisibility(View.VISIBLE);
-                        myViewHolder.loading.setVisibility(View.GONE);
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-        };
-
-        myViewHolder.video.setOnInfoListener(onInfoToPlayStateListener);
-
-        myViewHolder.video.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (myViewHolder.video.isPlaying()){
-                    myViewHolder.video.pause();
-                    myViewHolder.video.setOnInfoListener(onInfoToPlayStateListener);
-                }else {
-                    myViewHolder.video.start();
-                    myViewHolder.video.setOnInfoListener(onInfoToPlayStateListener);
-
-                }
-            }
-        });
     }
 
     @Override
@@ -109,10 +106,32 @@ public class VideoDetailAdapter extends RecyclerView.Adapter<VideoDetailAdapter.
         return dataSet.size();
     }
 
-    public VideoDetailAdapter(ArrayList<StatusModel> dataSet , Context context){
+    @Override
+    public void onViewRecycled(@NonNull MyViewHolder holder) {
+        int position = holder.getAdapterPosition();
+        if (dataSet.get(position) != null) {
+            dataSet.get(position).getPlayer().release();
+        }
+        super.onViewRecycled(holder);
+    }
+
+    public VideoDetailAdapter(RecyclerView recyclerView, LinearLayoutManager layoutManager , ArrayList<StatusModel> dataSet, Context context) {
         this.dataSet = dataSet;
         this.context = context;
+        this.layoutManager = layoutManager;
+        this.recyclerView = recyclerView;
     }
+
+
+
+    private MediaSource buildMediaSource(Uri uri) {
+
+        return new ExtractorMediaSource.Factory(
+                new DefaultHttpDataSourceFactory("exoplayer-codelab")).createMediaSource(uri);
+    }
+
+
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -120,8 +139,9 @@ public class VideoDetailAdapter extends RecyclerView.Adapter<VideoDetailAdapter.
         TextView seen;
         TextView like;
         TextView unLike;
-        VideoView video;
+        JzvdStd video;
         LinearLayout loading;
+        public PlayerView mExoPlayer;
 
 
         public MyViewHolder(@NonNull View itemView) {
@@ -133,7 +153,15 @@ public class VideoDetailAdapter extends RecyclerView.Adapter<VideoDetailAdapter.
             unLike = itemView.findViewById(R.id.tv_dislike);
             video = itemView.findViewById(R.id.view_video);
             loading = itemView.findViewById(R.id.view_loading);
-
+            mExoPlayer = itemView.findViewById(R.id.player_view);
         }
+
+
+
     }
+
+
+
+
+
 }

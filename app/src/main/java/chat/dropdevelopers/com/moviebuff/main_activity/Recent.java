@@ -45,14 +45,14 @@ public class Recent extends Fragment {
         category = new ArrayList<StatusCateModel>();
 
         data = new ArrayList<StatusModel>();
-        data.add(new StatusModel("", "Abu", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",10, "",5, 5));
-        data.add(new StatusModel("", "Rim", "","http://dropdevelopers.vcandu.com/1537855313.mp4",20, "",5, 5));
-        data.add(new StatusModel("", "Vishnu", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",30, "",5, 5));
-        data.add(new StatusModel("", "Jio", "","http://dropdevelopers.vcandu.com/1537855313.mp4",10, "",5, 5));
-        data.add(new StatusModel("", "Muhammed", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",20, "",5, 5));
-        data.add(new StatusModel("", "Biju", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",30, "",5, 5));
-        data.add(new StatusModel("", "Riju", "","http://dropdevelopers.vcandu.com/1537855313.mp4",10, "",5, 5));
-        data.add(new StatusModel("", "Manu", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",10, "",5, 5));
+        data.add(new StatusModel("", "Abu", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",10, "",5, 5,""));
+        data.add(new StatusModel("", "Rim", "","http://dropdevelopers.vcandu.com/1537855313.mp4",20, "",5, 5,""));
+        data.add(new StatusModel("", "Vishnu", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",30, "",5, 5,""));
+        data.add(new StatusModel("", "Jio", "","http://dropdevelopers.vcandu.com/1537855313.mp4",10, "",5, 5,""));
+        data.add(new StatusModel("", "Muhammed", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",20, "",5, 5,""));
+        data.add(new StatusModel("", "Biju", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",30, "",5, 5,""));
+        data.add(new StatusModel("", "Riju", "","http://dropdevelopers.vcandu.com/1537855313.mp4",10, "",5, 5,""));
+        data.add(new StatusModel("", "Manu", "","http://dropdevelopers.vcandu.com/MOVBuff153.mp4",10, "",5, 5,""));
 
 
         adapter = new StatusAdapter(data, view.getContext());

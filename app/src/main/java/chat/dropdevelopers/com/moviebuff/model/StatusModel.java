@@ -1,5 +1,7 @@
 package chat.dropdevelopers.com.moviebuff.model;
 
+import com.google.android.exoplayer2.ExoPlayer;
+
 public class StatusModel {
 
     String title;
@@ -10,8 +12,13 @@ public class StatusModel {
     String statusId;
     int like;
     int unLike;
+    String thump;
+    Boolean playWhenReady = false;
+    int currentWindow = 0;
+    long playbackPosition = 0;
+    ExoPlayer player;
 
-    public StatusModel(String title, String name, String userId, String video_url, int seen, String statusId, int like, int unLike) {
+    public StatusModel(String title, String name, String userId, String video_url, int seen, String statusId, int like, int unLike , String thump ) {
         this.title = title;
         this.name = name;
         this.userId = userId;
@@ -20,6 +27,15 @@ public class StatusModel {
         this.statusId = statusId;
         this.like = like;
         this.unLike = unLike;
+        this.thump = thump;
+    }
+
+    public String getThump() {
+        return thump;
+    }
+
+    public void setThump(String thump) {
+        this.thump = thump;
     }
 
     public String getTitle() {
@@ -84,5 +100,37 @@ public class StatusModel {
 
     public void setUnLike(int unLike) {
         this.unLike = unLike;
+    }
+
+    public Boolean getPlayWhenReady() {
+        return playWhenReady;
+    }
+
+    public void setPlayWhenReady(Boolean playWhenReady) {
+        this.playWhenReady = playWhenReady;
+    }
+
+    public int getCurrentWindow() {
+        return currentWindow;
+    }
+
+    public void setCurrentWindow(int currentWindow) {
+        this.currentWindow = currentWindow;
+    }
+
+    public long getPlaybackPosition() {
+        return playbackPosition;
+    }
+
+    public void setPlaybackPosition(long playbackPosition) {
+        this.playbackPosition = playbackPosition;
+    }
+
+    public ExoPlayer getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(ExoPlayer player) {
+        this.player = player;
     }
 }
